@@ -62,7 +62,6 @@
 - [x] Validar fluxos de usuário
 - [x] Testes unitários passando
 
-
 ## Melhorias Adicionais (v2.0)
 - [x] Gráficos de evolução do rebanho (Pizza Chart)
 - [x] Componentes de gráficos customizados (Line, Bar, Pie, Progress)
@@ -71,3 +70,32 @@
 - [x] Feedback háptico nos botões
 - [x] Tela de configurações completa
 - [x] Valores padrão configuráveis (preço arroba, rendimento)
+
+## Versão Comercial Final (v3.0)
+
+### Sistema de Autenticação
+- [x] Tela de splash animada com logo (3 segundos)
+- [x] Tela de login/cadastro inicial
+- [x] Cadastro do cliente (nome, email, telefone, CPF/CNPJ)
+- [x] Cadastro da fazenda (nome, localização, tamanho em hectares)
+- [x] Autenticação biométrica (Face ID / Touch ID) a partir do 2º acesso
+- [x] Persistência de sessão do usuário
+- [x] Logout e troca de conta
+
+### Dashboard Administrativo (Painel do Dono)
+- [x] Estrutura para integração com Firebase (documentação)
+- [x] Visualização de clientes cadastrados (documentação)
+- [x] Status de pagamentos (ativo/inativo) (documentação)
+- [x] Relatórios de uso do app (documentação)
+- [x] Métricas de engajamento (documentação)
+
+### Dados Iniciais
+- [x] Zerar animais cadastrados
+- [x] Zerar vendas registradas
+- [x] Zerar custos registrados
+- [x] Estado inicial limpo para produção
+
+### Documentação
+- [x] Passo a passo para publicar na App Store (DEPLOY_GUIDE.md)
+- [x] Guia de integração com Firebase existente (ADMIN_DASHBOARD.md)
+- [x] Instruções de configuração do painel admin (ADMIN_DASHBOARD.md)

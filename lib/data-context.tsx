@@ -71,6 +71,7 @@ interface DataContextType {
   // Loading
   loading: boolean;
   refreshData: () => Promise<void>;
+  zerarDados: () => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | null>(null);
@@ -81,29 +82,7 @@ const STORAGE_KEYS = {
   CUSTOS: "@fazenda_digital_custos",
 };
 
-// Dados iniciais de demonstração
-const DEMO_ANIMAIS: Animal[] = [
-  { id: "1", identificador: "BOI-001", categoria: "Boi", raca: "Nelore", peso: 520, lote: "A", status: "Saudável", dataCadastro: "2025-01-15" },
-  { id: "2", identificador: "BOI-002", categoria: "Boi", raca: "Angus", peso: 480, lote: "A", status: "Saudável", dataCadastro: "2025-01-15" },
-  { id: "3", identificador: "VAC-001", categoria: "Vaca", raca: "Nelore", peso: 450, lote: "B", status: "Saudável", dataCadastro: "2025-01-10" },
-  { id: "4", identificador: "BEZ-001", categoria: "Bezerro", raca: "Nelore", peso: 180, lote: "C", status: "Saudável", dataCadastro: "2025-01-20" },
-  { id: "5", identificador: "NOV-001", categoria: "Novilha", raca: "Brahman", peso: 320, lote: "B", status: "Em tratamento", dataCadastro: "2025-01-18" },
-  { id: "6", identificador: "BOI-003", categoria: "Boi", raca: "Nelore", peso: 550, lote: "A", status: "Saudável", dataCadastro: "2025-01-12" },
-  { id: "7", identificador: "VAC-002", categoria: "Vaca", raca: "Gir", peso: 420, lote: "B", status: "Observação", dataCadastro: "2025-01-08" },
-];
-
-const DEMO_VENDAS: Venda[] = [
-  { id: "v1", animais: ["x1", "x2", "x3"], quantidadeAnimais: 3, pesoTotal: 1500, arrobas: 50, precoArroba: 280, valorTotal: 14000, comprador: "Frigorífico JBS", data: "2025-01-10" },
-  { id: "v2", animais: ["x4", "x5"], quantidadeAnimais: 2, pesoTotal: 1020, arrobas: 34, precoArroba: 290, valorTotal: 9860, comprador: "Frigorífico Marfrig", data: "2025-01-18" },
-];
-
-const DEMO_CUSTOS: Custo[] = [
-  { id: "c1", descricao: "Ração para engorda - Lote A", valor: 4500, categoria: "Alimentação", data: "2025-01-05" },
-  { id: "c2", descricao: "Vacinas aftosa", valor: 1200, categoria: "Veterinário", data: "2025-01-08" },
-  { id: "c3", descricao: "Manutenção cerca elétrica", valor: 800, categoria: "Manutenção", data: "2025-01-12" },
-  { id: "c4", descricao: "Salário vaqueiro - Janeiro", valor: 2500, categoria: "Mão de Obra", data: "2025-01-15" },
-  { id: "c5", descricao: "Sal mineral", valor: 650, categoria: "Alimentação", data: "2025-01-20" },
-];
+// App inicia sem dados de demonstração - pronto para uso real
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const [animais, setAnimais] = useState<Animal[]>([]);
@@ -121,27 +100,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         AsyncStorage.getItem(STORAGE_KEYS.CUSTOS),
       ]);
 
-      // Se não houver dados, usar dados de demonstração
-      if (animaisData) {
-        setAnimais(JSON.parse(animaisData));
-      } else {
-        setAnimais(DEMO_ANIMAIS);
-        await AsyncStorage.setItem(STORAGE_KEYS.ANIMAIS, JSON.stringify(DEMO_ANIMAIS));
-      }
-
-      if (vendasData) {
-        setVendas(JSON.parse(vendasData));
-      } else {
-        setVendas(DEMO_VENDAS);
-        await AsyncStorage.setItem(STORAGE_KEYS.VENDAS, JSON.stringify(DEMO_VENDAS));
-      }
-
-      if (custosData) {
-        setCustos(JSON.parse(custosData));
-      } else {
-        setCustos(DEMO_CUSTOS);
-        await AsyncStorage.setItem(STORAGE_KEYS.CUSTOS, JSON.stringify(DEMO_CUSTOS));
-      }
+      // Carregar dados salvos ou iniciar vazio
+      setAnimais(animaisData ? JSON.parse(animaisData) : []);
+      setVendas(vendasData ? JSON.parse(vendasData) : []);
+      setCustos(custosData ? JSON.parse(custosData) : []);
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
     } finally {
@@ -235,6 +197,23 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return Number((arrobas * precoArroba).toFixed(2));
   };
 
+  // Zerar todos os dados
+  const zerarDados = async () => {
+    try {
+      await AsyncStorage.multiRemove([
+        STORAGE_KEYS.ANIMAIS,
+        STORAGE_KEYS.VENDAS,
+        STORAGE_KEYS.CUSTOS,
+      ]);
+      setAnimais([]);
+      setVendas([]);
+      setCustos([]);
+    } catch (error) {
+      console.error("Erro ao zerar dados:", error);
+      Alert.alert("Erro", "Não foi possível zerar os dados.");
+    }
+  };
+
   // Stats
   const totalAnimais = animais.length;
   const totalArrobas = Math.round(animais.reduce((acc, a) => acc + (a.peso || 0), 0) / 30);
@@ -266,6 +245,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     mediaPeso,
     loading,
     refreshData: loadData,
+    zerarDados,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

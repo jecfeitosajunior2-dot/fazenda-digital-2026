@@ -1,6 +1,8 @@
 import { ScreenContainer } from "@/components/screen-container";
+import { useAuth } from "@/lib/auth-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -48,8 +50,12 @@ const STORAGE_KEY_LEMBRETES = "@fazenda_digital_lembretes";
 const STORAGE_KEY_CONFIG = "@fazenda_digital_config";
 
 export default function ConfigScreen() {
+  const router = useRouter();
+  const { usuario, fazenda, logout, ativarBiometria, verificarBiometriaDisponivel } = useAuth();
+  
   const [lembretes, setLembretes] = useState<Lembrete[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [biometriaDisponivel, setBiometriaDisponivel] = useState(false);
   const [novoLembrete, setNovoLembrete] = useState<Partial<Lembrete>>({
     tipo: "vacinacao",
     ativo: true,
@@ -64,7 +70,13 @@ export default function ConfigScreen() {
 
   useEffect(() => {
     loadData();
+    checkBiometria();
   }, []);
+
+  const checkBiometria = async () => {
+    const disponivel = await verificarBiometriaDisponivel();
+    setBiometriaDisponivel(disponivel);
+  };
 
   const loadData = async () => {
     try {
@@ -104,6 +116,36 @@ export default function ConfigScreen() {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
+  };
+
+  const handleAtivarBiometria = async () => {
+    triggerHaptic();
+    const sucesso = await ativarBiometria();
+    if (sucesso) {
+      if (Platform.OS !== "web") {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+      Alert.alert("Sucesso", "Biometria ativada! No próximo acesso, você poderá usar o reconhecimento facial.");
+    }
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Sair da Conta",
+      "Deseja realmente sair? Você precisará fazer login novamente.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Sair",
+          style: "destructive",
+          onPress: async () => {
+            triggerHaptic();
+            await logout();
+            router.replace("/auth" as any);
+          },
+        },
+      ]
+    );
   };
 
   const handleAddLembrete = () => {
@@ -185,6 +227,70 @@ export default function ConfigScreen() {
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false}>
+          {/* Perfil do Usuário */}
+          {usuario && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Meu Perfil</Text>
+              
+              <View style={styles.profileCard}>
+                <View style={styles.profileAvatar}>
+                  <MaterialIcons name="person" size={40} color={COLORS.primary} />
+                </View>
+                <View style={styles.profileInfo}>
+                  <Text style={styles.profileName}>{usuario.nome}</Text>
+                  <Text style={styles.profileEmail}>{usuario.email}</Text>
+                  <Text style={styles.profileDoc}>{usuario.tipoDocumento}: {usuario.documento}</Text>
+                </View>
+              </View>
+
+              {fazenda && (
+                <View style={styles.fazendaCard}>
+                  <MaterialIcons name="home" size={24} color={COLORS.primary} />
+                  <View style={styles.fazendaInfo}>
+                    <Text style={styles.fazendaNome}>{fazenda.nome}</Text>
+                    <Text style={styles.fazendaLocal}>
+                      {fazenda.cidade}, {fazenda.estado} • {fazenda.tamanhoHectares} ha
+                    </Text>
+                  </View>
+                </View>
+              )}
+            </View>
+          )}
+
+          {/* Segurança */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Segurança</Text>
+            
+            {biometriaDisponivel && (
+              <View style={styles.settingItem}>
+                <View style={styles.settingInfo}>
+                  <MaterialIcons name="face" size={24} color={COLORS.primary} />
+                  <View>
+                    <Text style={styles.settingLabel}>Reconhecimento Facial</Text>
+                    <Text style={styles.settingDesc}>
+                      {usuario?.biometriaAtivada ? "Ativado" : "Desativado"}
+                    </Text>
+                  </View>
+                </View>
+                {!usuario?.biometriaAtivada ? (
+                  <TouchableOpacity
+                    style={styles.activateButton}
+                    onPress={handleAtivarBiometria}
+                  >
+                    <Text style={styles.activateButtonText}>Ativar</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <MaterialIcons name="check-circle" size={24} color={COLORS.success} />
+                )}
+              </View>
+            )}
+
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <MaterialIcons name="logout" size={20} color={COLORS.danger} />
+              <Text style={styles.logoutButtonText}>Sair da Conta</Text>
+            </TouchableOpacity>
+          </View>
+
           {/* Seção de Notificações */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Notificações</Text>
@@ -346,7 +452,7 @@ export default function ConfigScreen() {
                 <MaterialIcons name="eco" size={40} color={COLORS.primary} />
               </View>
               <Text style={styles.aboutName}>Fazenda Digital</Text>
-              <Text style={styles.aboutVersion}>Versão 2.0.0</Text>
+              <Text style={styles.aboutVersion}>Versão 3.0.0</Text>
               <Text style={styles.aboutDesc}>
                 Sistema completo de gestão pecuária para produtores de todo o Brasil.
               </Text>
@@ -519,6 +625,64 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  // Profile
+  profileCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.background,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  profileAvatar: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: COLORS.primary + "20",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  profileInfo: {
+    marginLeft: 16,
+    flex: 1,
+  },
+  profileName: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: COLORS.text,
+  },
+  profileEmail: {
+    fontSize: 14,
+    color: COLORS.gray,
+    marginTop: 2,
+  },
+  profileDoc: {
+    fontSize: 12,
+    color: COLORS.gray,
+    marginTop: 2,
+  },
+  fazendaCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.primary + "10",
+    padding: 12,
+    borderRadius: 10,
+    gap: 12,
+  },
+  fazendaInfo: {
+    flex: 1,
+  },
+  fazendaNome: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: COLORS.primary,
+  },
+  fazendaLocal: {
+    fontSize: 13,
+    color: COLORS.gray,
+    marginTop: 2,
+  },
+  // Settings
   settingItem: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -531,10 +695,42 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    flex: 1,
   },
   settingLabel: {
     fontSize: 15,
     color: COLORS.text,
+  },
+  settingDesc: {
+    fontSize: 12,
+    color: COLORS.gray,
+    marginTop: 2,
+  },
+  activateButton: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  activateButtonText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: COLORS.white,
+  },
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: COLORS.danger + "10",
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 16,
+    gap: 8,
+  },
+  logoutButtonText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: COLORS.danger,
   },
   inputItem: {
     marginBottom: 16,
