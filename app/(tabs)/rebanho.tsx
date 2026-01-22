@@ -9,6 +9,7 @@ import {
   FlatList,
   Image,
   Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,6 +17,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import * as Haptics from "expo-haptics";
 
 const COLORS = {
   primary: "#1B4332",
@@ -87,6 +89,18 @@ export default function RebanhoScreen() {
     return { total, pesoTotal, arrobas };
   }, [filteredAnimais]);
 
+  const triggerHaptic = () => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+  };
+
+  const triggerSuccessHaptic = () => {
+    if (Platform.OS !== "web") {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
+  };
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -120,9 +134,11 @@ export default function RebanhoScreen() {
 
       if (editingAnimal) {
         await updateAnimal(editingAnimal.id, animalData);
+        triggerSuccessHaptic();
         Alert.alert("Sucesso", "Animal atualizado com sucesso!");
       } else {
         await addAnimal(animalData);
+        triggerSuccessHaptic();
         Alert.alert("Sucesso", "Animal cadastrado com sucesso!");
       }
 
@@ -144,6 +160,7 @@ export default function RebanhoScreen() {
           text: "Excluir",
           style: "destructive",
           onPress: async () => {
+            triggerHaptic();
             await deleteAnimal(animal.id);
             Alert.alert("Sucesso", "Animal excluído com sucesso!");
           },

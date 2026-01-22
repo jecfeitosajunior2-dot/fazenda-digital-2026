@@ -1,4 +1,5 @@
 import { useData } from "@/lib/data-context";
+import { PieChart, BarChart } from "@/components/charts";
 import { ScreenContainer } from "@/components/screen-container";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -193,33 +194,23 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          {/* Composição do Rebanho */}
+          {/* Composição do Rebanho - Gráfico de Pizza */}
           <View style={styles.sectionTitle}>
             <MaterialIcons name="pie-chart" size={20} color={COLORS.primary} />
             <Text style={styles.sectionTitleText}>Composição do Rebanho</Text>
           </View>
 
-          <View style={styles.compositionContainer}>
-            <View style={styles.compositionItem}>
-              <View style={[styles.compositionDot, { backgroundColor: COLORS.primary }]} />
-              <Text style={styles.compositionLabel}>Bois</Text>
-              <Text style={styles.compositionValue}>{bois}</Text>
-            </View>
-            <View style={styles.compositionItem}>
-              <View style={[styles.compositionDot, { backgroundColor: COLORS.secondary }]} />
-              <Text style={styles.compositionLabel}>Vacas</Text>
-              <Text style={styles.compositionValue}>{vacas}</Text>
-            </View>
-            <View style={styles.compositionItem}>
-              <View style={[styles.compositionDot, { backgroundColor: COLORS.accent }]} />
-              <Text style={styles.compositionLabel}>Bezerros</Text>
-              <Text style={styles.compositionValue}>{bezerros}</Text>
-            </View>
-            <View style={styles.compositionItem}>
-              <View style={[styles.compositionDot, { backgroundColor: COLORS.gold }]} />
-              <Text style={styles.compositionLabel}>Novilhas</Text>
-              <Text style={styles.compositionValue}>{novilhas}</Text>
-            </View>
+          <View style={styles.chartCard}>
+            <PieChart
+              data={[
+                { label: "Bois", value: bois, color: COLORS.primary },
+                { label: "Vacas", value: vacas, color: COLORS.secondary },
+                { label: "Bezerros", value: bezerros, color: COLORS.accent },
+                { label: "Novilhas", value: novilhas, color: COLORS.gold },
+              ]}
+              size={140}
+              showLegend={true}
+            />
           </View>
 
           {/* Indicadores de Desempenho */}
@@ -483,6 +474,16 @@ const styles = StyleSheet.create({
   financeValue: {
     fontSize: 20,
     fontWeight: "bold",
+  },
+  chartCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   compositionContainer: {
     flexDirection: "row",

@@ -61,3 +61,13 @@
 - [x] Testar relatórios
 - [x] Validar fluxos de usuário
 - [x] Testes unitários passando
+
+
+## Melhorias Adicionais (v2.0)
+- [x] Gráficos de evolução do rebanho (Pizza Chart)
+- [x] Componentes de gráficos customizados (Line, Bar, Pie, Progress)
+- [x] Calculadora pecuária avançada (GMD, conversão alimentar, projeção)
+- [x] Sistema de lembretes para vacinação/vermifugo/pesagem
+- [x] Feedback háptico nos botões
+- [x] Tela de configurações completa
+- [x] Valores padrão configuráveis (preço arroba, rendimento)

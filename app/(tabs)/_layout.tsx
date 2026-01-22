@@ -10,6 +10,24 @@ export default function TabLayout() {
   const bottomPadding = Platform.OS === "web" ? 12 : Math.max(insets.bottom, 8);
   const tabBarHeight = 60 + bottomPadding;
 
+  const TabIcon = ({ name, color, focused }: { name: string; color: string; focused: boolean }) => (
+    <View style={{ alignItems: "center" }}>
+      <MaterialIcons name={name as any} size={26} color={color} />
+      {focused && (
+        <View
+          style={{
+            position: "absolute",
+            bottom: -6,
+            width: 4,
+            height: 4,
+            borderRadius: 2,
+            backgroundColor: "#1B4332",
+          }}
+        />
+      )}
+    </View>
+  );
+
   return (
     <Tabs
       screenOptions={{
@@ -30,7 +48,7 @@ export default function TabLayout() {
           shadowRadius: 4,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: "600",
           marginTop: 2,
         },
@@ -41,21 +59,7 @@ export default function TabLayout() {
         options={{
           title: "Início",
           tabBarIcon: ({ color, focused }) => (
-            <View style={{ alignItems: "center" }}>
-              <MaterialIcons name="home" size={26} color={color} />
-              {focused && (
-                <View
-                  style={{
-                    position: "absolute",
-                    bottom: -6,
-                    width: 4,
-                    height: 4,
-                    borderRadius: 2,
-                    backgroundColor: "#1B4332",
-                  }}
-                />
-              )}
-            </View>
+            <TabIcon name="home" color={color} focused={focused} />
           ),
         }}
       />
@@ -64,21 +68,7 @@ export default function TabLayout() {
         options={{
           title: "Rebanho",
           tabBarIcon: ({ color, focused }) => (
-            <View style={{ alignItems: "center" }}>
-              <MaterialIcons name="pets" size={26} color={color} />
-              {focused && (
-                <View
-                  style={{
-                    position: "absolute",
-                    bottom: -6,
-                    width: 4,
-                    height: 4,
-                    borderRadius: 2,
-                    backgroundColor: "#1B4332",
-                  }}
-                />
-              )}
-            </View>
+            <TabIcon name="pets" color={color} focused={focused} />
           ),
         }}
       />
@@ -87,21 +77,7 @@ export default function TabLayout() {
         options={{
           title: "Vendas",
           tabBarIcon: ({ color, focused }) => (
-            <View style={{ alignItems: "center" }}>
-              <MaterialIcons name="attach-money" size={26} color={color} />
-              {focused && (
-                <View
-                  style={{
-                    position: "absolute",
-                    bottom: -6,
-                    width: 4,
-                    height: 4,
-                    borderRadius: 2,
-                    backgroundColor: "#1B4332",
-                  }}
-                />
-              )}
-            </View>
+            <TabIcon name="attach-money" color={color} focused={focused} />
           ),
         }}
       />
@@ -110,21 +86,16 @@ export default function TabLayout() {
         options={{
           title: "Custos",
           tabBarIcon: ({ color, focused }) => (
-            <View style={{ alignItems: "center" }}>
-              <MaterialIcons name="receipt-long" size={26} color={color} />
-              {focused && (
-                <View
-                  style={{
-                    position: "absolute",
-                    bottom: -6,
-                    width: 4,
-                    height: 4,
-                    borderRadius: 2,
-                    backgroundColor: "#1B4332",
-                  }}
-                />
-              )}
-            </View>
+            <TabIcon name="receipt-long" color={color} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="calculadora"
+        options={{
+          title: "Calcular",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="calculate" color={color} focused={focused} />
           ),
         }}
       />
@@ -133,21 +104,16 @@ export default function TabLayout() {
         options={{
           title: "Relatórios",
           tabBarIcon: ({ color, focused }) => (
-            <View style={{ alignItems: "center" }}>
-              <MaterialIcons name="bar-chart" size={26} color={color} />
-              {focused && (
-                <View
-                  style={{
-                    position: "absolute",
-                    bottom: -6,
-                    width: 4,
-                    height: 4,
-                    borderRadius: 2,
-                    backgroundColor: "#1B4332",
-                  }}
-                />
-              )}
-            </View>
+            <TabIcon name="bar-chart" color={color} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="config"
+        options={{
+          title: "Config",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="settings" color={color} focused={focused} />
           ),
         }}
       />
