@@ -108,7 +108,7 @@ export default function HomeScreen() {
               <Text style={styles.subtitle}>Gestão Pecuária Inteligente</Text>
             </View>
             <View style={styles.logoContainer}>
-              <MaterialIcons name="eco" size={48} color={COLORS.gold} />
+              <MaterialIcons name="agriculture" size={48} color={COLORS.gold} />
             </View>
           </View>
         </LinearGradient>

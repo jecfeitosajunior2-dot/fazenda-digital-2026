@@ -12,7 +12,7 @@ export default function TabLayout() {
 
   const TabIcon = ({ name, color, focused }: { name: string; color: string; focused: boolean }) => (
     <View style={{ alignItems: "center" }}>
-      <MaterialIcons name={name as any} size={26} color={color} />
+      <MaterialIcons name={name as any} size={24} color={color} />
       {focused && (
         <View
           style={{
@@ -48,7 +48,7 @@ export default function TabLayout() {
           shadowRadius: 4,
         },
         tabBarLabelStyle: {
-          fontSize: 10,
+          fontSize: 9,
           fontWeight: "600",
           marginTop: 2,
         },
@@ -69,6 +69,24 @@ export default function TabLayout() {
           title: "Rebanho",
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="pets" color={color} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="peso-ia"
+        options={{
+          title: "Peso IA",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="monitor-weight" color={color} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="curral-ia"
+        options={{
+          title: "Curral IA",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="grid-view" color={color} focused={focused} />
           ),
         }}
       />

@@ -142,3 +142,14 @@
 - [x] Arquivo .env exemplo
 - [x] Docker Compose
 - [x] Checklist de implantação
+
+
+## Atualização de UI e Branding (v4.1)
+- [x] Adicionar aba "Peso IA" na tab bar
+- [x] Adicionar aba "Curral IA" na tab bar
+- [x] Gerar nova logo oficial com touro verde/dourado
+- [x] Integrar nome "Fazenda Digital" dentro do ícone do touro
+- [x] Atualizar logo no splash screen
+- [x] Atualizar logo no ícone do app
+- [x] Atualizar logo no header do app
+- [x] Copiar logo para todos os locais necessários
