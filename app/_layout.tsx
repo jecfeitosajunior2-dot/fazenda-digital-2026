@@ -90,6 +90,8 @@ export default function RootLayout() {
                 <Stack.Screen name="splash" options={{ animation: "fade" }} />
                 <Stack.Screen name="auth" options={{ animation: "slide_from_right" }} />
                 <Stack.Screen name="(tabs)" options={{ animation: "fade" }} />
+                <Stack.Screen name="curral" options={{ animation: "slide_from_right", headerShown: true, headerTitle: "Curral ao Vivo", headerBackTitle: "Voltar" }} />
+                <Stack.Screen name="peso" options={{ animation: "slide_from_right", headerShown: true, headerTitle: "Corredor Peso", headerBackTitle: "Voltar" }} />
                 <Stack.Screen name="oauth/callback" />
               </Stack>
               <StatusBar style="auto" />

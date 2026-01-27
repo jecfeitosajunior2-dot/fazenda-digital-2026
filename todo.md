@@ -99,3 +99,46 @@
 - [x] Passo a passo para publicar na App Store (DEPLOY_GUIDE.md)
 - [x] Guia de integração com Firebase existente (ADMIN_DASHBOARD.md)
 - [x] Instruções de configuração do painel admin (ADMIN_DASHBOARD.md)
+
+
+## Visão Computacional (v4.0)
+
+### Funcionalidade 1 - Contagem de Gado no Curral
+- [x] Modelagem: tabela cameras
+- [x] Modelagem: tabela pens/currais
+- [x] Modelagem: tabela pen_counts
+- [x] API: GET /pens/:id/count
+- [x] API: GET /pens/:id/count/history
+- [x] API: GET /cameras/status
+- [x] API: POST /vision/ingest (interno)
+- [x] Tela: Curral ao Vivo
+- [x] Widget: Status das câmeras
+- [x] Widget: Histórico por hora/dia
+
+### Funcionalidade 2 - Peso por Câmera no Corredor
+- [x] Modelagem: tabela weigh_stations
+- [x] Modelagem: tabela weight_estimates
+- [x] Modelagem: tabela calibrations
+- [x] API: GET /weigh-stations/:id/latest
+- [x] API: GET /weigh-stations/:id/history
+- [x] API: POST /weigh-stations/:id/calibrations
+- [x] Tela: Corredor - Peso Estimado
+- [x] Widget: Lista de passagens
+- [x] Widget: Gráfico de histórico
+- [x] Módulo de calibração
+
+### Vision Agent (Serviço Separado)
+- [x] Estrutura do serviço Python
+- [x] Conexão RTSP/ONVIF
+- [x] Detecção YOLO + ByteTrack
+- [x] Suavização de contagem
+- [x] Estimativa de peso
+- [x] Modo MOCK
+- [x] Healthcheck
+- [x] Config por ENV
+
+### Documentação e Deploy
+- [x] Script de migração do banco
+- [x] Arquivo .env exemplo
+- [x] Docker Compose
+- [x] Checklist de implantação
