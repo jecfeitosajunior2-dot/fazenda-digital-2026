@@ -213,3 +213,16 @@
 - [x] Corrigir alinhamento e espaçamento
 - [x] Ajustar responsividade para telas grandes
 - [x] Testar em diferentes resoluções
+
+
+## Modo Offline Completo + Versão Oficial (v5.0)
+- [x] Implementar sistema de sincronização offline/online (lib/sync-manager.ts)
+- [ ] Conectar autenticação com backend real (tRPC) - Ver GUIA_MODO_OFFLINE.md
+- [x] Garantir AsyncStorage funciona 100% offline (mobile)
+- [x] Implementar IndexedDB para web offline (lib/storage.ts)
+- [x] Criar indicador visual de status (components/status-indicator.tsx)
+- [x] Implementar fila de sincronização (sync-manager)
+- [ ] Testar fluxo completo offline → online → sincronização
+- [ ] Validar persistência de dados em ambas plataformas
+- [ ] Garantir todas as features funcionam offline
+- [ ] Backup automático quando conectar
