@@ -238,3 +238,11 @@
 - [x] Criar checklist de implementação
 - [x] Estimar horas e custos
 - [ ] Implementar (seguir GUIA_IMPLEMENTACAO_EXECUTIVO.md)
+
+
+## Implementação Backend Completo (v5.2)
+- [x] Adicionar tabelas ao schema.ts (fazendas, animais, vendas, custos, planos, assinaturas, pagamentos, métricas)
+- [x] Executar pnpm db:push para criar tabelas
+- [x] Criar funções CRUD em db.ts
+- [x] Criar endpoints tRPC completos
+- [x] Integrar router de fazenda no appRouter

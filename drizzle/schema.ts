@@ -252,3 +252,164 @@ export const visionLogs = mysqlTable("vision_logs", {
 
 export type VisionLog = typeof visionLogs.$inferSelect;
 export type InsertVisionLog = typeof visionLogs.$inferInsert;
+
+// ============================================================================
+// GESTÃO DE REBANHO - TABELAS PRINCIPAIS
+// ============================================================================
+
+/**
+ * Tabela de fazendas - Cada usuário pode ter múltiplas fazendas
+ */
+export const fazendas = mysqlTable("fazendas", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Dono da fazenda
+  nome: varchar("nome", { length: 200 }).notNull(),
+  localizacao: varchar("localizacao", { length: 300 }),
+  area: decimal("area", { precision: 10, scale: 2 }), // Área em hectares
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Fazenda = typeof fazendas.$inferSelect;
+export type InsertFazenda = typeof fazendas.$inferInsert;
+
+/**
+ * Tabela de animais - Rebanho
+ */
+export const animais = mysqlTable("animais", {
+  id: int("id").autoincrement().primaryKey(),
+  fazendaId: int("fazendaId").notNull(),
+  identificacao: varchar("identificacao", { length: 50 }).notNull(), // Brinco/chip
+  raca: varchar("raca", { length: 100 }),
+  sexo: mysqlEnum("sexo", ["macho", "femea"]).notNull(),
+  dataNascimento: timestamp("dataNascimento"),
+  pesoAtual: decimal("pesoAtual", { precision: 8, scale: 2 }), // kg
+  status: mysqlEnum("status", ["ativo", "vendido", "morto"]).default("ativo").notNull(),
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Animal = typeof animais.$inferSelect;
+export type InsertAnimal = typeof animais.$inferInsert;
+
+/**
+ * Tabela de vendas
+ */
+export const vendas = mysqlTable("vendas", {
+  id: int("id").autoincrement().primaryKey(),
+  fazendaId: int("fazendaId").notNull(),
+  animalId: int("animalId"), // Pode ser null se for venda em lote
+  comprador: varchar("comprador", { length: 200 }).notNull(),
+  quantidade: int("quantidade").notNull(), // Número de animais
+  pesoTotal: decimal("pesoTotal", { precision: 10, scale: 2 }), // kg
+  valorTotal: decimal("valorTotal", { precision: 12, scale: 2 }).notNull(), // R$
+  valorPorKg: decimal("valorPorKg", { precision: 8, scale: 2 }), // R$/kg
+  dataVenda: timestamp("dataVenda").notNull(),
+  formaPagamento: varchar("formaPagamento", { length: 50 }),
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Venda = typeof vendas.$inferSelect;
+export type InsertVenda = typeof vendas.$inferInsert;
+
+/**
+ * Tabela de custos
+ */
+export const custos = mysqlTable("custos", {
+  id: int("id").autoincrement().primaryKey(),
+  fazendaId: int("fazendaId").notNull(),
+  categoria: mysqlEnum("categoria", [
+    "alimentacao",
+    "veterinario",
+    "manutencao",
+    "mao_de_obra",
+    "outros"
+  ]).notNull(),
+  descricao: varchar("descricao", { length: 300 }).notNull(),
+  valor: decimal("valor", { precision: 12, scale: 2 }).notNull(), // R$
+  dataCusto: timestamp("dataCusto").notNull(),
+  fornecedor: varchar("fornecedor", { length: 200 }),
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Custo = typeof custos.$inferSelect;
+export type InsertCusto = typeof custos.$inferInsert;
+
+// ============================================================================
+// SISTEMA FREEMIUM - TABELAS
+// ============================================================================
+
+/**
+ * Tabela de planos
+ */
+export const planos = mysqlTable("planos", {
+  id: int("id").autoincrement().primaryKey(),
+  nome: varchar("nome", { length: 100 }).notNull(), // "Gratuito", "Premium", "Enterprise"
+  descricao: text("descricao"),
+  precoMensal: decimal("precoMensal", { precision: 10, scale: 2 }).notNull(),
+  precoAnual: decimal("precoAnual", { precision: 10, scale: 2 }),
+  limiteAnimais: int("limiteAnimais"), // null = ilimitado
+  limiteVendas: int("limiteVendas"), // null = ilimitado
+  features: json("features").$type<string[]>().notNull(), // ["peso_ia", "curral_ia", "relatorios"]
+  ativo: mysqlEnum("ativo", ["sim", "nao"]).default("sim").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Plano = typeof planos.$inferSelect;
+export type InsertPlano = typeof planos.$inferInsert;
+
+/**
+ * Tabela de assinaturas
+ */
+export const assinaturas = mysqlTable("assinaturas", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  planoId: int("planoId").notNull(),
+  status: mysqlEnum("status", ["ativa", "cancelada", "expirada", "trial"]).default("trial").notNull(),
+  dataInicio: timestamp("dataInicio").notNull(),
+  dataFim: timestamp("dataFim"),
+  renovacaoAutomatica: mysqlEnum("renovacaoAutomatica", ["sim", "nao"]).default("sim").notNull(),
+  metodoPagamento: varchar("metodoPagamento", { length: 50 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Assinatura = typeof assinaturas.$inferSelect;
+export type InsertAssinatura = typeof assinaturas.$inferInsert;
+
+/**
+ * Tabela de pagamentos
+ */
+export const pagamentos = mysqlTable("pagamentos", {
+  id: int("id").autoincrement().primaryKey(),
+  assinaturaId: int("assinaturaId").notNull(),
+  valor: decimal("valor", { precision: 10, scale: 2 }).notNull(),
+  status: mysqlEnum("status", ["pendente", "aprovado", "recusado", "estornado"]).default("pendente").notNull(),
+  metodoPagamento: varchar("metodoPagamento", { length: 50 }).notNull(),
+  transacaoId: varchar("transacaoId", { length: 200 }), // ID do gateway de pagamento
+  dataPagamento: timestamp("dataPagamento"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Pagamento = typeof pagamentos.$inferSelect;
+export type InsertPagamento = typeof pagamentos.$inferInsert;
+
+/**
+ * Tabela de métricas de uso - Para analytics do dashboard admin
+ */
+export const metricas = mysqlTable("metricas", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  evento: varchar("evento", { length: 100 }).notNull(), // "tela_rebanho_aberta", "animal_cadastrado", etc
+  dados: json("dados"), // Dados adicionais do evento
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Metrica = typeof metricas.$inferSelect;
+export type InsertMetrica = typeof metricas.$inferInsert;
