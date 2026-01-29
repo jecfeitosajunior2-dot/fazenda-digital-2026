@@ -195,4 +195,32 @@ export const fazendaRouter = router({
       await db.deleteCusto(input.id);
       return { success: true };
     }),
+
+  // ============================================================================
+  // DASHBOARD ADMIN
+  // ============================================================================
+
+  getTotalUsuarios: publicProcedure.query(async () => {
+    return db.getTotalUsuarios();
+  }),
+
+  getTotalAssinaturasAtivas: publicProcedure.query(async () => {
+    return db.getTotalAssinaturasAtivas();
+  }),
+
+  getReceitaMensal: publicProcedure.query(async () => {
+    return db.getReceitaMensal();
+  }),
+
+  getUsuariosRecentes: publicProcedure
+    .input(z.object({ limit: z.number().default(10) }))
+    .query(async ({ input }: { input: any }) => {
+      return db.getUsuariosRecentes(input.limit);
+    }),
+
+  getAssinaturasRecentes: publicProcedure
+    .input(z.object({ limit: z.number().default(10) }))
+    .query(async ({ input }: { input: any }) => {
+      return db.getAssinaturasRecentes(input.limit);
+    }),
 });

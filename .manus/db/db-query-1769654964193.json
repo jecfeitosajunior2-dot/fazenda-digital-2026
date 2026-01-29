@@ -1,0 +1,9 @@
+{
+  "query": "\nINSERT IGNORE INTO planos (nome, descricao, precoMensal, precoAnual, limiteAnimais, limiteVendas, features, ativo) VALUES\n('Gratuito', 'Plano gratuito com funcionalidades básicas', 0, 0, 10, 5, '[\"dashboard_basico\"]', 'sim'),\n('Premium', 'Plano premium com funcionalidades avançadas', 49.90, 499.00, 100, 50, '[\"dashboard_completo\", \"peso_ia\", \"relatorios\", \"suporte_prioritario\"]', 'sim'),\n('Enterprise', 'Plano enterprise com recursos ilimitados', 149.90, 1499.00, NULL, NULL, '[\"dashboard_completo\", \"peso_ia\", \"curral_ia\", \"relatorios\", \"api_integracao\", \"multiplas_fazendas\", \"suporte_dedicado\"]', 'sim');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3z7bLMrwyjabB4f.8e4de514c0a1 --database JBahLkqrjSK5Uhr432apoy --execute \nINSERT IGNORE INTO planos (nome, descricao, precoMensal, precoAnual, limiteAnimais, limiteVendas, features, ativo) VALUES\n('Gratuito', 'Plano gratuito com funcionalidades básicas', 0, 0, 10, 5, '[\"dashboard_basico\"]', 'sim'),\n('Premium', 'Plano premium com funcionalidades avançadas', 49.90, 499.00, 100, 50, '[\"dashboard_completo\", \"peso_ia\", \"relatorios\", \"suporte_prioritario\"]', 'sim'),\n('Enterprise', 'Plano enterprise com recursos ilimitados', 149.90, 1499.00, NULL, NULL, '[\"dashboard_completo\", \"peso_ia\", \"curral_ia\", \"relatorios\", \"api_integracao\", \"multiplas_fazendas\", \"suporte_dedicado\"]', 'sim');\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 434
+}

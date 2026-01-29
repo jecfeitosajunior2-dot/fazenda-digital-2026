@@ -246,3 +246,13 @@
 - [x] Criar funções CRUD em db.ts
 - [x] Criar endpoints tRPC completos
 - [x] Integrar router de fazenda no appRouter
+
+
+## Dashboard Admin Completo (v6.0)
+- [x] Criar planos freemium no banco de dados (Gratuito, Premium, Enterprise)
+- [x] Criar rota /admin no app web
+- [x] Dashboard: Layout base com sidebar e navegação
+- [x] Dashboard: Tela de métricas gerais (overview)
+- [x] Dashboard: Tela de listagem de usuários
+- [x] Dashboard: Tela de assinaturas e pagamentos
+- [x] Adicionar endpoints tRPC para dashboard admin
