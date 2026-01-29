@@ -161,3 +161,55 @@
 - [x] Layout responsivo do content (maxWidth 1400px, padding 40px)
 - [x] Cards financeiros em linha horizontal para telas grandes
 - [x] Cards financeiros com flex: 1 e minWidth: 300px
+
+
+## Sistema de Gestão Empresarial Completo (v5.0)
+
+### Banco de Dados
+- [ ] Tabela de planos (free, premium, enterprise)
+- [ ] Tabela de assinaturas (user_id, plan_id, status, start_date, end_date)
+- [ ] Tabela de pagamentos (transaction_id, user_id, amount, status, date)
+- [ ] Tabela de métricas de uso (user_id, feature, timestamp)
+- [ ] Tabela de eventos (login, logout, feature_used, error)
+
+### Backend APIs
+- [ ] API de autenticação e autorização
+- [ ] API de gerenciamento de planos
+- [ ] API de assinaturas (criar, atualizar, cancelar)
+- [ ] API de pagamentos (integração Stripe/PayPal)
+- [ ] API de métricas (usuários ativos, features mais usadas)
+- [ ] API de relatórios (faturamento, clientes, KPIs)
+- [ ] API de exportação (PDF, Excel, CSV)
+
+### Dashboard Web Admin
+- [ ] Tela de login admin
+- [ ] Dashboard principal (métricas gerais)
+- [ ] Página de usuários (lista, detalhes, ativar/desativar)
+- [ ] Página de assinaturas (status, histórico)
+- [ ] Página de pagamentos (transações, reembolsos)
+- [ ] Página de métricas (gráficos de uso)
+- [ ] Página de relatórios (exportáveis)
+- [ ] Página de configurações (planos, preços)
+
+### Integração App Mobile (Freemium)
+- [ ] Tela de planos (free vs premium)
+- [ ] Tela de pagamento (checkout)
+- [ ] Bloqueio de features premium
+- [ ] Notificação de upgrade
+- [ ] Gerenciamento de assinatura no app
+
+### Relatórios e Exportação
+- [ ] Relatório de faturamento mensal
+- [ ] Relatório de clientes ativos/inativos
+- [ ] Relatório de features mais usadas
+- [ ] Relatório de churn (cancelamentos)
+- [ ] Exportação em PDF
+- [ ] Exportação em Excel
+- [ ] Exportação em CSV
+
+
+## Correção de Layout Web (v4.2.2)
+- [x] Analisar vídeo do usuário para identificar problemas
+- [x] Corrigir alinhamento e espaçamento
+- [x] Ajustar responsividade para telas grandes
+- [x] Testar em diferentes resoluções

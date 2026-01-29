@@ -20,6 +20,8 @@ import {
 import * as Haptics from "expo-haptics";
 
 const { width } = Dimensions.get("window");
+const isWeb = Platform.OS === "web";
+const isLargeScreen = width > 768;
 
 const COLORS = {
   primary: "#1B4332",
@@ -745,6 +747,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     padding: 20,
+    maxWidth: isWeb && isLargeScreen ? 600 : undefined,
+    alignSelf: "center",
+    width: "100%",
   },
   header: {
     alignItems: "center",
