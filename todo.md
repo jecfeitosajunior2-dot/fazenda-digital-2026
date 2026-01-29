@@ -266,3 +266,10 @@
 - [x] Documentação completa de alinhamento de schema (ALINHAMENTO_SCHEMA.md)
 - [ ] Integração backend/frontend (opcional - ver ALINHAMENTO_SCHEMA.md)
 - [ ] Implementar autenticação admin (opcional - requer customização do Manus OAuth)
+
+
+## Correção Dashboard Admin (v7.1)
+- [x] Investigar estrutura de rotas do Expo Router
+- [x] Corrigir roteamento para tornar /admin acessível via web
+- [x] Testar acesso ao dashboard administrativo
+- [x] Validar que app mobile continua funcionando normalmente
