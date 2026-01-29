@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
   Animated,
   Dimensions,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -18,8 +17,6 @@ import {
 } from "react-native";
 
 const { width } = Dimensions.get("window");
-const isWeb = Platform.OS === "web";
-const isLargeScreen = width > 768;
 
 const COLORS = {
   primary: "#1B4332",
@@ -111,7 +108,7 @@ export default function HomeScreen() {
               <Text style={styles.subtitle}>Gestão Pecuária Inteligente</Text>
             </View>
             <View style={styles.logoContainer}>
-              <MaterialIcons name="eco" size={48} color={COLORS.gold} />
+              <MaterialIcons name="agriculture" size={48} color={COLORS.gold} />
             </View>
           </View>
         </LinearGradient>
@@ -145,7 +142,7 @@ export default function HomeScreen() {
             <Text style={styles.sectionTitleText}>Resumo Financeiro</Text>
           </View>
 
-          <View style={[styles.financeCardsContainer, isWeb && isLargeScreen && { flexDirection: "row", flexWrap: "wrap" }]}>
+          <View style={styles.financeCardsContainer}>
             <View style={styles.financeCard}>
               <View style={[styles.financeIconBg, { backgroundColor: COLORS.success + "20" }]}>
                 <MaterialIcons name="trending-up" size={24} color={COLORS.success} />
@@ -401,11 +398,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   content: {
-    paddingHorizontal: isWeb && isLargeScreen ? 40 : 16,
+    paddingHorizontal: 16,
     marginTop: -20,
-    maxWidth: isWeb && isLargeScreen ? 1400 : undefined,
-    alignSelf: "center",
-    width: "100%",
   },
   mainCardsRow: {
     flexDirection: "row",
@@ -460,8 +454,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
-    flex: isWeb && isLargeScreen ? 1 : undefined,
-    minWidth: isWeb && isLargeScreen ? 300 : undefined,
   },
   financeIconBg: {
     width: 48,

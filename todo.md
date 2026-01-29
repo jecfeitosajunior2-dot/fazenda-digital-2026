@@ -153,3 +153,11 @@
 - [x] Atualizar logo no ícone do app
 - [x] Atualizar logo no header do app
 - [x] Copiar logo para todos os locais necessários
+
+
+## Versão Web Responsiva (v4.2)
+- [x] Adicionar detecção de plataforma (Platform.OS === "web")
+- [x] Adicionar detecção de tamanho de tela (width > 768)
+- [x] Layout responsivo do content (maxWidth 1400px, padding 40px)
+- [x] Cards financeiros em linha horizontal para telas grandes
+- [x] Cards financeiros com flex: 1 e minWidth: 300px
