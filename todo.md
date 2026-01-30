@@ -273,3 +273,19 @@
 - [x] Corrigir roteamento para tornar /admin acessível via web
 - [x] Testar acesso ao dashboard administrativo
 - [x] Validar que app mobile continua funcionando normalmente
+
+
+## Sistema de Produção Completo (v8.0)
+- [x] Usar PostgreSQL (TiDB) em vez de Firebase
+- [x] Autenticação via Manus OAuth (já configurada)
+- [x] Conectar backend ao PostgreSQL
+- [x] Integrar tela de Rebanho com backend via tRPC
+- [x] Integrar tela de Vendas com backend via tRPC
+- [x] Integrar tela de Custos com backend via tRPC
+- [x] Implementar isolamento de dados por usuário (via fazenda)
+- [x] Implementar criação automática de fazenda no primeiro login
+- [x] Ativar sincronização multi-dispositivo
+- [x] Conectar dashboard admin com dados reais
+- [ ] Publicar em Vercel (URL permanente) - Opcional, usuário fará manualmente
+- [x] Dados iniciais limpos (sem dados de teste)
+- [ ] Testar fluxo completo: cadastro → login → uso → sincronização - Próxima etapa

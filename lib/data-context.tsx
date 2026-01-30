@@ -1,6 +1,6 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
-import { Alert } from "react-native";
+import React, { createContext, useContext, ReactNode } from "react";
+import { trpc } from "./trpc";
+import { useAuth } from "@/hooks/use-auth";
 
 // ============ TYPES ============
 export interface Animal {
@@ -76,113 +76,164 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | null>(null);
 
-const STORAGE_KEYS = {
-  ANIMAIS: "@fazenda_digital_animais",
-  VENDAS: "@fazenda_digital_vendas",
-  CUSTOS: "@fazenda_digital_custos",
-};
-
-// App inicia sem dados de demonstração - pronto para uso real
-
+/**
+ * DataProvider conectado ao backend via tRPC
+ * Sincroniza dados entre dispositivos usando PostgreSQL
+ */
 export function DataProvider({ children }: { children: ReactNode }) {
-  const [animais, setAnimais] = useState<Animal[]>([]);
-  const [vendas, setVendas] = useState<Venda[]>([]);
-  const [custos, setCustos] = useState<Custo[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const utils = trpc.useUtils();
 
-  // Load data from AsyncStorage
-  const loadData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const [animaisData, vendasData, custosData] = await Promise.all([
-        AsyncStorage.getItem(STORAGE_KEYS.ANIMAIS),
-        AsyncStorage.getItem(STORAGE_KEYS.VENDAS),
-        AsyncStorage.getItem(STORAGE_KEYS.CUSTOS),
-      ]);
+  // Buscar fazenda do usuário
+  const { data: fazenda } = trpc.fazenda.getFazenda.useQuery(undefined, {
+    enabled: !!user,
+  });
 
-      // Carregar dados salvos ou iniciar vazio
-      setAnimais(animaisData ? JSON.parse(animaisData) : []);
-      setVendas(vendasData ? JSON.parse(vendasData) : []);
-      setCustos(custosData ? JSON.parse(custosData) : []);
-    } catch (error) {
-      console.error("Erro ao carregar dados:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // Buscar animais
+  const { data: animaisBackend = [], isLoading: loadingAnimais } = trpc.fazenda.getAnimais.useQuery(
+    { fazendaId: fazenda?.id || 0 },
+    { enabled: !!fazenda }
+  );
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  // Buscar vendas
+  const { data: vendasBackend = [], isLoading: loadingVendas } = trpc.fazenda.getVendas.useQuery(
+    { fazendaId: fazenda?.id || 0 },
+    { enabled: !!fazenda }
+  );
 
-  // Save animais
-  const saveAnimais = async (newAnimais: Animal[]) => {
-    await AsyncStorage.setItem(STORAGE_KEYS.ANIMAIS, JSON.stringify(newAnimais));
-    setAnimais(newAnimais);
-  };
+  // Buscar custos
+  const { data: custosBackend = [], isLoading: loadingCustos } = trpc.fazenda.getCustos.useQuery(
+    { fazendaId: fazenda?.id || 0 },
+    { enabled: !!fazenda }
+  );
 
-  // Save vendas
-  const saveVendas = async (newVendas: Venda[]) => {
-    await AsyncStorage.setItem(STORAGE_KEYS.VENDAS, JSON.stringify(newVendas));
-    setVendas(newVendas);
-  };
+  // Mutations
+  const createAnimalMutation = trpc.fazenda.createAnimal.useMutation({
+    onSuccess: () => utils.fazenda.getAnimais.invalidate(),
+  });
 
-  // Save custos
-  const saveCustos = async (newCustos: Custo[]) => {
-    await AsyncStorage.setItem(STORAGE_KEYS.CUSTOS, JSON.stringify(newCustos));
-    setCustos(newCustos);
-  };
+  const updateAnimalMutation = trpc.fazenda.updateAnimal.useMutation({
+    onSuccess: () => utils.fazenda.getAnimais.invalidate(),
+  });
+
+  const deleteAnimalMutation = trpc.fazenda.deleteAnimal.useMutation({
+    onSuccess: () => utils.fazenda.getAnimais.invalidate(),
+  });
+
+  const createVendaMutation = trpc.fazenda.createVenda.useMutation({
+    onSuccess: () => {
+      utils.fazenda.getVendas.invalidate();
+      utils.fazenda.getAnimais.invalidate();
+    },
+  });
+
+  const deleteVendaMutation = trpc.fazenda.deleteVenda.useMutation({
+    onSuccess: () => utils.fazenda.getVendas.invalidate(),
+  });
+
+  const createCustoMutation = trpc.fazenda.createCusto.useMutation({
+    onSuccess: () => utils.fazenda.getCustos.invalidate(),
+  });
+
+  const deleteCustoMutation = trpc.fazenda.deleteCusto.useMutation({
+    onSuccess: () => utils.fazenda.getCustos.invalidate(),
+  });
+
+  // Converter dados do backend para formato do app
+  const animais: Animal[] = animaisBackend.map((a: any) => ({
+    id: String(a.id),
+    identificador: a.identificacao || "",
+    categoria: mapSexoToCategoria(a.sexo),
+    raca: a.raca || "",
+    peso: Number(a.pesoAtual) || 0,
+    lote: "", // TODO: adicionar campo lote no backend
+    status: "Saudável", // TODO: adicionar campo status no backend
+    dataCadastro: a.createdAt ? new Date(a.createdAt).toISOString().split("T")[0] : "",
+  }));
+
+  const vendas: Venda[] = vendasBackend.map((v: any) => ({
+    id: String(v.id),
+    animais: v.animalId ? [String(v.animalId)] : [],
+    quantidadeAnimais: v.quantidade || 0,
+    pesoTotal: Number(v.pesoTotal) || 0,
+    arrobas: Math.round((Number(v.pesoTotal) || 0) / 30),
+    precoArroba: Number(v.valorPorKg) ? Number(v.valorPorKg) * 30 : 0,
+    valorTotal: Number(v.valorTotal) || 0,
+    comprador: v.comprador || "",
+    data: v.dataVenda ? new Date(v.dataVenda).toISOString().split("T")[0] : "",
+  }));
+
+  const custos: Custo[] = custosBackend.map((c: any) => ({
+    id: String(c.id),
+    descricao: c.descricao || "",
+    valor: Number(c.valor) || 0,
+    categoria: mapCategoriaBackendToFrontend(c.categoria),
+    data: c.dataCusto ? new Date(c.dataCusto).toISOString().split("T")[0] : "",
+  }));
 
   // Animal operations
   const addAnimal = async (animal: Omit<Animal, "id" | "dataCadastro">) => {
-    const newAnimal: Animal = {
-      ...animal,
-      id: Date.now().toString(),
-      dataCadastro: new Date().toISOString().split("T")[0],
-    };
-    await saveAnimais([...animais, newAnimal]);
+    if (!fazenda) throw new Error("Fazenda não encontrada");
+    
+    await createAnimalMutation.mutateAsync({
+      fazendaId: fazenda.id,
+      identificacao: animal.identificador,
+      raca: animal.raca,
+      sexo: mapCategoriaToSexo(animal.categoria),
+      pesoAtual: animal.peso,
+      observacoes: "",
+    });
   };
 
   const updateAnimal = async (id: string, updates: Partial<Animal>) => {
-    const updated = animais.map((a) => (a.id === id ? { ...a, ...updates } : a));
-    await saveAnimais(updated);
+    await updateAnimalMutation.mutateAsync({
+      id: Number(id),
+      identificacao: updates.identificador,
+      raca: updates.raca,
+      sexo: updates.categoria ? mapCategoriaToSexo(updates.categoria) : undefined,
+      pesoAtual: updates.peso,
+    });
   };
 
   const deleteAnimal = async (id: string) => {
-    const filtered = animais.filter((a) => a.id !== id);
-    await saveAnimais(filtered);
+    await deleteAnimalMutation.mutateAsync({ id: Number(id) });
   };
 
   // Venda operations
   const addVenda = async (venda: Omit<Venda, "id">) => {
-    const newVenda: Venda = {
-      ...venda,
-      id: Date.now().toString(),
-    };
-    await saveVendas([...vendas, newVenda]);
+    if (!fazenda) throw new Error("Fazenda não encontrada");
     
-    // Remover animais vendidos
-    const animaisRestantes = animais.filter((a) => !venda.animais.includes(a.id));
-    await saveAnimais(animaisRestantes);
+    await createVendaMutation.mutateAsync({
+      fazendaId: fazenda.id,
+      animalId: venda.animais[0] ? Number(venda.animais[0]) : undefined,
+      comprador: venda.comprador || "Cliente",
+      quantidade: venda.quantidadeAnimais,
+      pesoTotal: venda.pesoTotal,
+      valorTotal: venda.valorTotal,
+      valorPorKg: venda.precoArroba / 30,
+      dataVenda: new Date(venda.data),
+    });
   };
 
   const deleteVenda = async (id: string) => {
-    const filtered = vendas.filter((v) => v.id !== id);
-    await saveVendas(filtered);
+    await deleteVendaMutation.mutateAsync({ id: Number(id) });
   };
 
   // Custo operations
   const addCusto = async (custo: Omit<Custo, "id">) => {
-    const newCusto: Custo = {
-      ...custo,
-      id: Date.now().toString(),
-    };
-    await saveCustos([...custos, newCusto]);
+    if (!fazenda) throw new Error("Fazenda não encontrada");
+    
+    await createCustoMutation.mutateAsync({
+      fazendaId: fazenda.id,
+      categoria: mapCategoriaFrontendToBackend(custo.categoria),
+      descricao: custo.descricao,
+      valor: custo.valor,
+      dataCusto: new Date(custo.data),
+    });
   };
 
   const deleteCusto = async (id: string) => {
-    const filtered = custos.filter((c) => c.id !== id);
-    await saveCustos(filtered);
+    await deleteCustoMutation.mutateAsync({ id: Number(id) });
   };
 
   // Calculadora
@@ -197,21 +248,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return Number((arrobas * precoArroba).toFixed(2));
   };
 
-  // Zerar todos os dados
+  // Zerar todos os dados (não implementado - requer endpoint no backend)
   const zerarDados = async () => {
-    try {
-      await AsyncStorage.multiRemove([
-        STORAGE_KEYS.ANIMAIS,
-        STORAGE_KEYS.VENDAS,
-        STORAGE_KEYS.CUSTOS,
-      ]);
-      setAnimais([]);
-      setVendas([]);
-      setCustos([]);
-    } catch (error) {
-      console.error("Erro ao zerar dados:", error);
-      Alert.alert("Erro", "Não foi possível zerar os dados.");
-    }
+    console.warn("zerarDados não implementado com backend");
   };
 
   // Stats
@@ -221,6 +260,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const custosTotal = custos.reduce((acc, c) => acc + (c.valor || 0), 0);
   const lucroTotal = faturamentoTotal - custosTotal;
   const mediaPeso = animais.length > 0 ? Math.round(animais.reduce((acc, a) => acc + (a.peso || 0), 0) / animais.length) : 0;
+
+  const loading = loadingAnimais || loadingVendas || loadingCustos;
+
+  const refreshData = async () => {
+    await Promise.all([
+      utils.fazenda.getAnimais.invalidate(),
+      utils.fazenda.getVendas.invalidate(),
+      utils.fazenda.getCustos.invalidate(),
+    ]);
+  };
 
   const value: DataContextType = {
     animais,
@@ -244,7 +293,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     lucroTotal,
     mediaPeso,
     loading,
-    refreshData: loadData,
+    refreshData,
     zerarDados,
   };
 
@@ -257,4 +306,35 @@ export function useData() {
     throw new Error("useData must be used within a DataProvider");
   }
   return context;
+}
+
+// Helper functions para mapear entre frontend e backend
+function mapSexoToCategoria(sexo: "macho" | "femea"): Animal["categoria"] {
+  return sexo === "macho" ? "Boi" : "Vaca";
+}
+
+function mapCategoriaToSexo(categoria: Animal["categoria"]): "macho" | "femea" {
+  return categoria === "Boi" || categoria === "Bezerro" ? "macho" : "femea";
+}
+
+function mapCategoriaBackendToFrontend(categoria: string): Custo["categoria"] {
+  const map: Record<string, Custo["categoria"]> = {
+    alimentacao: "Alimentação",
+    veterinario: "Veterinário",
+    manutencao: "Manutenção",
+    mao_de_obra: "Mão de Obra",
+    outros: "Outros",
+  };
+  return map[categoria] || "Outros";
+}
+
+function mapCategoriaFrontendToBackend(categoria: Custo["categoria"]): "alimentacao" | "veterinario" | "manutencao" | "mao_de_obra" | "outros" {
+  const map: Record<Custo["categoria"], "alimentacao" | "veterinario" | "manutencao" | "mao_de_obra" | "outros"> = {
+    "Alimentação": "alimentacao",
+    "Veterinário": "veterinario",
+    "Manutenção": "manutencao",
+    "Mão de Obra": "mao_de_obra",
+    "Outros": "outros",
+  };
+  return map[categoria];
 }

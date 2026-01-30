@@ -119,7 +119,21 @@ export async function getFazendaByUserId(userId: number) {
   if (!db) return null;
 
   const result = await db.select().from(fazendas).where(eq(fazendas.userId, userId)).limit(1);
-  return result[0] || null;
+  
+  // Se usuário não tem fazenda, criar uma automaticamente
+  if (!result[0]) {
+    const insertId = await createFazenda({
+      userId,
+      nome: "Minha Fazenda",
+      localizacao: "",
+      area: "0",
+    });
+    
+    const newResult = await db.select().from(fazendas).where(eq(fazendas.id, insertId)).limit(1);
+    return newResult[0] || null;
+  }
+  
+  return result[0];
 }
 
 export async function createFazenda(data: InsertFazenda) {
