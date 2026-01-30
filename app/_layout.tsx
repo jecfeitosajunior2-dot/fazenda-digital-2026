@@ -82,10 +82,10 @@ export default function RootLayout() {
 
   const content = (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-        <DataProvider>
-          <trpc.Provider client={trpcClient} queryClient={queryClient}>
-            <QueryClientProvider client={queryClient}>
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <DataProvider>
               <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="splash" options={{ animation: "fade" }} />
                 <Stack.Screen name="auth" options={{ animation: "slide_from_right" }} />
@@ -96,10 +96,10 @@ export default function RootLayout() {
                 <Stack.Screen name="oauth/callback" />
               </Stack>
               <StatusBar style="auto" />
-            </QueryClientProvider>
-          </trpc.Provider>
-        </DataProvider>
-      </AuthProvider>
+            </DataProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </trpc.Provider>
     </GestureHandlerRootView>
   );
 
